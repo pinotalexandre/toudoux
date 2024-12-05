@@ -4,7 +4,9 @@ import React, { useState, useEffect } from 'react';
 export const SortingModal = ({ show, tasks, onConfirm }) => {
     const [keepTasks, setKeepTasks] = useState([]);
     const [deleteTasks, setDeleteTasks] = useState([]);
+    const [draggedItem, setDraggedItem] = useState(null);
 
+    // Reset tasks when modal opens
     useEffect(() => {
         if (show) {
             setKeepTasks(tasks);
@@ -12,22 +14,48 @@ export const SortingModal = ({ show, tasks, onConfirm }) => {
         }
     }, [show, tasks]);
 
-    const handleDragStart = (e, id) => {
-        e.dataTransfer.setData('taskId', id);
+    // Drag start handler
+    const handleDragStart = (e, task) => {
+        setDraggedItem(task);
+        e.dataTransfer.effectAllowed = 'move';
+        // Add styling to dragged item
+        e.target.classList.add('dragging');
     };
 
-    const handleDrop = (e, targetList) => {
+    // Drag end handler
+    const handleDragEnd = (e) => {
+        e.target.classList.remove('dragging');
+        setDraggedItem(null);
+    };
+
+    // Drag over handler
+    const handleDragOver = (e) => {
         e.preventDefault();
-        const taskId = parseInt(e.dataTransfer.getData('taskId'));
-        const task = tasks.find(t => t.id === taskId);
-        
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    // Drop handler
+    const handleDrop = (targetList) => {
+        if (!draggedItem) return;
+
         if (targetList === 'keep') {
-            setKeepTasks(prev => [...prev.filter(t => t.id !== task.id), task]);
-            setDeleteTasks(prev => prev.filter(t => t.id !== task.id));
+            setKeepTasks(prev => {
+                const filtered = prev.filter(t => t.id !== draggedItem.id);
+                return [...filtered, draggedItem];
+            });
+            setDeleteTasks(prev => prev.filter(t => t.id !== draggedItem.id));
         } else {
-            setDeleteTasks(prev => [...prev.filter(t => t.id !== task.id), task]);
-            setKeepTasks(prev => prev.filter(t => t.id !== task.id));
+            setDeleteTasks(prev => {
+                const filtered = prev.filter(t => t.id !== draggedItem.id);
+                return [...filtered, draggedItem];
+            });
+            setKeepTasks(prev => prev.filter(t => t.id !== draggedItem.id));
         }
+    };
+
+    // Handle confirm
+    const handleConfirm = () => {
+        onConfirm(keepTasks);
     };
 
     if (!show) return null;
@@ -35,53 +63,93 @@ export const SortingModal = ({ show, tasks, onConfirm }) => {
     return (
         <div className="modal">
             <div className="modal-content">
-                <h2>C'est l'heure du tri quotidien !</h2>
+                <header className="modal-header">
+                    <h2>Time for your daily sort</h2>
+                    <p className="modal-subtitle">
+                        Drag and drop tasks to organize them
+                    </p>
+                </header>
+
                 <div className="sort-container">
-                    <div
-                        className="keep-tasks"
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => handleDrop(e, 'keep')}
+                    {/* Keep Section */}
+                    <section 
+                        className="sort-section keep-tasks"
+                        onDragOver={handleDragOver}
+                        onDrop={() => handleDrop('keep')}
                     >
-                        <h3>Tâches à garder</h3>
-                        <ul>
+                        <h3>
+                            Keep
+                            <span className="task-count">
+                                {keepTasks.length}
+                            </span>
+                        </h3>
+                        <div className="sort-items">
                             {keepTasks.map(task => (
-                                <li
+                                <div
                                     key={task.id}
                                     className="task-sort-item"
                                     draggable
-                                    onDragStart={(e) => handleDragStart(e, task.id)}
+                                    onDragStart={(e) => handleDragStart(e, task)}
+                                    onDragEnd={handleDragEnd}
                                 >
-                                    {task.text}
-                                </li>
+                                    <span className="task-text">{task.text}</span>
+                                    <div className="task-drag-handle">
+                                        ⋮
+                                    </div>
+                                </div>
                             ))}
-                        </ul>
-                    </div>
-                    <div
-                        className="delete-tasks"
-                        onDragOver={(e) => e.preventDefault()}
-                        onDrop={(e) => handleDrop(e, 'delete')}
+                            {keepTasks.length === 0 && (
+                                <div className="empty-state">
+                                    Drop tasks here to keep them
+                                </div>
+                            )}
+                        </div>
+                    </section>
+
+                    {/* Delete Section */}
+                    <section 
+                        className="sort-section delete-tasks"
+                        onDragOver={handleDragOver}
+                        onDrop={() => handleDrop('delete')}
                     >
-                        <h3>Tâches à supprimer</h3>
-                        <ul>
+                        <h3>
+                            Remove
+                            <span className="task-count">
+                                {deleteTasks.length}
+                            </span>
+                        </h3>
+                        <div className="sort-items">
                             {deleteTasks.map(task => (
-                                <li
+                                <div
                                     key={task.id}
                                     className="task-sort-item"
                                     draggable
-                                    onDragStart={(e) => handleDragStart(e, task.id)}
+                                    onDragStart={(e) => handleDragStart(e, task)}
+                                    onDragEnd={handleDragEnd}
                                 >
-                                    {task.text}
-                                </li>
+                                    <span className="task-text">{task.text}</span>
+                                    <div className="task-drag-handle">
+                                        ⋮
+                                    </div>
+                                </div>
                             ))}
-                        </ul>
-                    </div>
+                            {deleteTasks.length === 0 && (
+                                <div className="empty-state">
+                                    Drop tasks here to remove them
+                                </div>
+                            )}
+                        </div>
+                    </section>
                 </div>
-                <button 
-                    className="confirm-btn"
-                    onClick={() => onConfirm(keepTasks)}
-                >
-                    Confirmer le tri
-                </button>
+
+                <footer className="modal-footer">
+                    <button 
+                        className="confirm-btn"
+                        onClick={handleConfirm}
+                    >
+                        Confirm and continue
+                    </button>
+                </footer>
             </div>
         </div>
     );

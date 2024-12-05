@@ -4,6 +4,7 @@ import { AddTodo } from './components/AddTodo';
 import { TodoList } from './components/TodoList';
 import { SortingModal } from './components/SortingModal';
 import { useTodoLogic } from './hooks/useTodoLogic';
+import logo from './assets/twodo.svg';
 import './styles/App.css';
 
 function App() {
@@ -18,20 +19,31 @@ function App() {
 
     return (
         <div className="container">
-            <header>
-                <h1>Ma ToDo List Quotidienne</h1>
-                <div className="timer">
-                    Prochain tri dans: <span>{timeLeft}</span>
+            {/* Header */}
+            <header className="app-title">
+                <img src={logo} alt="Twodo" className="logo" />
+                <div className="timer" title="Time remaining until todo list reset">
+                    {timeLeft}
                 </div>
             </header>
 
-            <AddTodo onAdd={addTask} />
-            <TodoList tasks={tasks} onDelete={deleteTask} />
+            {/* Main Content */}
+            <main>
+                <AddTodo onAdd={addTask} />
+                <TodoList tasks={tasks} onDelete={deleteTask} />
+            </main>
+
+            {/* Modal */}
             <SortingModal
                 show={showModal}
                 tasks={tasks}
                 onConfirm={confirmSort}
             />
+
+            {/* Footer */}
+            <footer className="footer">
+                Handcrafted by <a href="https://alexandre.ee" target="_blank" rel="noopener noreferrer">Alexandre Pinot</a> with ❤️
+            </footer>
         </div>
     );
 }
