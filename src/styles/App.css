@@ -4,15 +4,15 @@
 /* VARIABLES & BASE */
 /* ================ */
 :root {
-    --font-title: 'Noto Serif', serif;
-    --font-text: 'Inter', sans-serif;
+    --font-geist: 'Geist', -apple-system, BlinkMacSystemFont, sans-serif;
     
     /* Colors */
     --color-text: #333;
     --color-text-light: #888;
     --color-text-lighter: #999;
-    --color-border: #eee;
+    --color-border: rgba(0, 0, 0, 0.03);
     --color-background: #ffffff;
+    --color-hover: rgba(0, 0, 0, 0.02);
     
     /* Spacing */
     --spacing-xs: 0.5rem;
@@ -38,13 +38,14 @@ html, body {
 }
 
 body {
-    font-family: var(--font-text);
+    font-family: var(--font-geist);
     line-height: 1.6;
     color: var(--color-text);
-    background: var(--color-background);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
+        background-color: #FFFEF9;
+    }
+    
 
 /* ========= */
 /* CONTAINER */
@@ -82,51 +83,12 @@ body {
     opacity: 1;
 }
 
-/* Timer */
-.timer {
-    color: var(--color-text-lighter);
-    font-size: 1rem;
-    font-family: var(--font-text);
-    opacity: 0.8;
-    transition: opacity 0.2s;
-    cursor: help;
-    position: relative;
-}
-
-.timer:hover {
-    opacity: 1;
-}
-
-.timer::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    right: 0;
-    background: var(--color-text);
-    color: white;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    border-radius: 4px;
-    font-size: 0.8rem;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.2s ease;
-    transform: translateY(5px);
-    pointer-events: none;
-}
-
-.timer:hover::after {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0);
-}
-
 /* ========= */
 /* TODO INPUT */
 /* ========= */
 .todo-input {
     width: 100%;
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var(--spacing-md);
 }
 
 .input-wrapper {
@@ -136,14 +98,15 @@ body {
 
 .fullscreen-input {
     width: 100%;
-    padding: var(--spacing-sm) var(--spacing-lg) var(--spacing-sm) 0;
-    font-size: 1.5rem;
-    line-height: 1.5;
+    padding: var(--spacing-sm) 0;
+    font-size: 40px;
+    line-height: 1.2;
+    font-weight: 300;
     border: none;
     outline: none;
     background: transparent;
     color: var(--color-text);
-    font-family: var(--font-text);
+    font-family: var(--font-geist);
     resize: none;
     min-height: 60px;
     height: auto;
@@ -152,8 +115,7 @@ body {
 
 .fullscreen-input::placeholder {
     color: var(--color-text-lighter);
-    opacity: 0.7;
-    font-weight: 300;
+    opacity: 0.2;
 }
 
 /* ========== */
@@ -162,28 +124,19 @@ body {
 .enter-hint {
     position: absolute;
     right: 0;
-    top: var(--spacing-sm);
+    top: 50%;
+    transform: translateY(-50%);
     display: flex;
     align-items: center;
     gap: 6px;
     color: var(--color-text-light);
+    font-size: 0.9rem;
+    padding: 4px 12px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.02);
     opacity: 0;
     transition: opacity 0.2s;
-    font-size: 0.9rem;
-    padding: 4px 8px;
-}
-
-.enter-key {
-    font-family: monospace;
-    border: 1px solid var(--color-border);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-}
-
-.hint-text {
-    color: var(--color-text-lighter);
-    font-size: 0.8rem;
+    pointer-events: none;
 }
 
 .input-wrapper:hover .enter-hint {
@@ -195,172 +148,83 @@ body {
 /* ========= */
 .todo-list {
     flex: 1;
+    margin-top: var(--spacing-md);
 }
 
 .task-item {
     display: flex;
     align-items: flex-start;
-    padding: var(--spacing-xs) 0;
+    padding: var(--spacing-sm) 0;
+    transition: background-color 0.2s;
     border-bottom: 1px solid var(--color-border);
-    opacity: 0.8;
-    transition: opacity 0.2s;
+}
+
+.task-item:last-child {
+    border-bottom: none;
 }
 
 .task-item:hover {
-    opacity: 1;
+    background-color: var(--color-hover);
 }
 
-.task-item span {
-    flex: 1;
-    font-size: 1.1rem;
-    white-space: pre-wrap;
-    padding-right: var(--spacing-sm);
-}
-
-.delete-btn {
-    background: none;
-    border: none;
-    color: var(--color-text-light);
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 0 var(--spacing-xs);
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.task-item:hover .delete-btn {
-    opacity: 0.6;
-}
-
-.delete-btn:hover {
-    opacity: 1;
-}
-
-/* ===== */
-/* MODAL */
-/* ===== */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--color-background);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    z-index: 1000;
-    overflow-y: auto;
-    padding: var(--spacing-lg) 0;
-}
-
-.modal-content {
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: var(--spacing-lg);
-}
-
-.modal-header {
-    margin-bottom: var(--spacing-lg);
-}
-
-.modal-header h2 {
-    font-family: var(--font-title);
-    font-size: 1.2rem;
-    color: var(--color-text);
-    font-weight: 500;
-    margin-bottom: var(--spacing-xs);
-}
-
-.modal-subtitle {
-    font-size: 0.9rem;
-    color: var(--color-text-light);
-}
-
-.sort-container {
-    display: flex;
-    gap: var(--spacing-lg);
-    margin: var(--spacing-lg) 0;
-}
-
-.sort-section {
+.task-content {
     flex: 1;
     display: flex;
-    flex-direction: column;
-}
-
-.sort-section h3 {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    color: var(--color-text-light);
-    font-weight: 400;
-    margin-bottom: var(--spacing-sm);
-}
-
-.task-count {
-    font-size: 0.8rem;
-    color: var(--color-text-lighter);
-}
-
-.sort-items {
-    min-height: 200px;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.task-sort-item {
-    display: flex;
-    align-items: center;
-    padding: var(--spacing-sm) 0;
-    border-bottom: 1px solid var(--color-border);
+    gap: var(--spacing-sm);
     font-size: 1.1rem;
     line-height: 1.5;
-    cursor: move;
-    opacity: 0.8;
-    transition: opacity 0.2s;
 }
 
-.task-sort-item:hover {
-    opacity: 1;
+.task-emoji {
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
 }
 
 .task-text {
     flex: 1;
     white-space: pre-wrap;
-    padding-right: var(--spacing-sm);
 }
 
-.task-drag-handle {
-    color: var(--color-text-lighter);
-    font-size: 1.2rem;
+.task-item.completed .task-text {
+    color: var(--color-text-light);
+    text-decoration: line-through;
+}
+
+/* Task Actions */
+.task-action {
+    background: none;
+    border: none;
+    color: var(--color-text-light);
+    font-size: 0.75rem;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    cursor: pointer;
     opacity: 0;
     transition: opacity 0.2s;
+    font-family: var(--font-geist);
 }
 
-.task-sort-item:hover .task-drag-handle {
+.task-item:hover .task-action {
     opacity: 0.6;
 }
 
-.task-sort-item.dragging {
-    opacity: 0.5;
+.task-action:hover {
+    opacity: 1 !important;
 }
 
-.empty-state {
-    padding: var(--spacing-lg);
-    text-align: center;
-    color: var(--color-text-lighter);
-    font-size: 0.9rem;
-    border: 1px dashed var(--color-border);
-    border-radius: 4px;
+/* ===== */
+/* TIMER */
+/* ===== */
+.timer {
+    font-family: 'Geist Mono', monospace;
+    color: var(--color-text-light);
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    font-feature-settings: "tnum" 1;
 }
 
-.modal-footer {
-    margin-top: var(--spacing-lg);
-    text-align: right;
+.timer:hover {
+    opacity: 1;
 }
 
 /* ====== */
@@ -383,6 +247,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    backdrop-filter: blur(10px);
 }
 
 .footer:hover {
@@ -409,39 +274,15 @@ body {
         padding-bottom: calc(var(--footer-height) + var(--spacing-lg));
     }
     
-    .app-title {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-xs);
-    }
-
-    .timer::after {
-        right: auto;
-        left: 50%;
-        transform: translateX(-50%) translateY(5px);
-    }
-    
-    .timer:hover::after {
-        transform: translateX(-50%) translateY(0);
-    }
-    
     .fullscreen-input {
-        font-size: 1.2rem;
+        font-size: 28px;
     }
     
-    .sort-container {
-        flex-direction: column;
+    .task-content {
+        font-size: 1rem;
     }
-
-    .sort-section + .sort-section {
-        margin-top: var(--spacing-lg);
-    }
-
-    .empty-state {
-        padding: var(--spacing-md);
-    }
-
-    .modal-content {
-        padding: var(--spacing-sm);
+    
+    .enter-hint {
+        display: none;
     }
 }
